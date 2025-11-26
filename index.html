@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>كارمكس | CARMEX Auto Care</title>
+    <title>كارمكس | CARMIX Auto Care</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -17,7 +17,7 @@
             --accent-color: #f59e0b;     
             --text-light: #f1f5f9;
             --border-glass: rgba(255, 255, 255, 0.1);
-            --whatsapp-color: #25D366; /* لون الواتساب */
+            --whatsapp-color: #25D366;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; scroll-behavior: smooth; }
@@ -104,7 +104,7 @@
         .service-card-tall:hover .service-overlay { background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(15,23,42,0.8) 100%); }
 
         /* =========================================
-           5. قسم الحجز (مع زر الواتساب الجديد)
+           5. قسم الحجز
            ========================================= */
         .booking-section { padding: 80px 5%; background: var(--main-dark); border-top: 1px solid #333; }
         .booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
@@ -117,95 +117,47 @@
         .booking-info-list li { margin-bottom: 15px; color: #94a3b8; display: flex; align-items: center; font-size: 1.1rem; }
         .booking-info-list i { color: var(--accent-color); margin-left: 10px; font-size: 1.2rem; }
 
-        /* زر الواتساب الجديد */
         .whatsapp-btn {
-            background: var(--whatsapp-color);
-            color: #fff;
-            width: 100%;
-            padding: 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            transform: skewX(-10deg);
-            transition: 0.3s;
-            border: none;
-            cursor: pointer;
+            background: var(--whatsapp-color); color: #fff; width: 100%; padding: 12px; border-radius: 4px;
+            text-decoration: none; font-weight: 800; display: flex; align-items: center; justify-content: center;
+            gap: 10px; margin-top: 20px; transform: skewX(-10deg); transition: 0.3s; border: none; cursor: pointer;
         }
         .whatsapp-btn span { transform: skewX(10deg); font-size: 1.1rem; }
         .whatsapp-btn i { transform: skewX(10deg); font-size: 1.3rem; }
         .whatsapp-btn:hover { background: #128C7E; transform: skewX(-10deg) translateY(-3px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
 
-        .divider {
-            text-align: center; margin: 15px 0; color: #64748b; font-size: 0.9rem; position: relative;
-        }
-        .divider::before, .divider::after {
-            content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: #334155;
-        }
+        .divider { text-align: center; margin: 15px 0; color: #64748b; font-size: 0.9rem; position: relative; }
+        .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: #334155; }
         .divider::before { left: 0; }
         .divider::after { right: 0; }
 
         /* =========================================
-           6. الفوتر (المعدل)
+           6. الفوتر
            ========================================= */
-        footer {
-            background-color: #050505;
-            padding: 80px 5% 30px;
-            color: #fff;
-            border-top: 1px solid #1e293b;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr 0.8fr 1.2fr;
-            gap: 40px;
-            margin-bottom: 60px;
-            align-items: start;
-        }
-
+        footer { background-color: #050505; padding: 80px 5% 30px; color: #fff; border-top: 1px solid #1e293b; }
+        .footer-grid { display: grid; grid-template-columns: 1.2fr 0.8fr 0.8fr 1.2fr; gap: 40px; margin-bottom: 60px; align-items: start; }
         .footer-brand h2 { font-size: 2rem; font-weight: 800; margin-bottom: 20px; font-style: italic; }
         .footer-brand h2 span { color: var(--accent-color); }
         .footer-brand p { color: #94a3b8; line-height: 1.8; margin-bottom: 25px; font-size: 0.95rem; }
-
         .social-icons { display: flex; gap: 10px; }
-        .social-btn {
-            width: 40px; height: 40px; border: 1px solid #333; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; text-decoration: none; transition: 0.3s;
-        }
+        .social-btn { width: 40px; height: 40px; border: 1px solid #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; transition: 0.3s; }
         .social-btn:hover { background: var(--accent-color); border-color: var(--accent-color); color: #000; }
-
         .footer-col h3 { font-size: 1.2rem; margin-bottom: 25px; color: #fff; font-weight: 700; }
-        
         .footer-links { list-style: none; padding: 0; }
         .footer-links li { margin-bottom: 15px; }
         .footer-links a { color: #cbd5e1; text-decoration: none; transition: 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
         .footer-links a::before { content: '\f104'; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-left: 10px; font-size: 0.8rem; color: var(--accent-color); }
         .footer-links a:hover { color: var(--accent-color); transform: translateX(-5px); }
-
         .contact-list-container { display: flex; flex-direction: column; gap: 25px; }
-        
         .contact-link { text-decoration: none; display: block; transition: 0.3s; }
         .contact-link:hover .c-icon-box { transform: scale(1.1); }
         .contact-link:hover .c-value { color: var(--accent-color); }
-
         .contact-item { display: flex; align-items: center; gap: 15px; width: 100%; }
-        
-        .c-icon-box {
-            width: 55px; height: 55px; background-color: var(--accent-color);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: #fff; flex-shrink: 0; transition: 0.3s;
-        }
-
+        .c-icon-box { width: 55px; height: 55px; background-color: var(--accent-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; flex-shrink: 0; transition: 0.3s; }
         .c-text { display: flex; flex-direction: column; justify-content: center; text-align: right; }
         .c-label { font-weight: 800; color: #fff; margin-bottom: 5px; font-size: 1.1rem; }
         .c-value { color: #cbd5e1; font-size: 0.95rem; font-family: 'Tajawal', sans-serif; transition: 0.3s; }
         .c-value.en-font { font-family: sans-serif; letter-spacing: 0.5px; direction: ltr; text-align: right; }
-
         .copyright { text-align: center; border-top: 1px solid #1e293b; padding-top: 25px; color: #64748b; font-size: 0.9rem; }
 
         /* =========================================
@@ -243,7 +195,7 @@
 <body>
 
     <header>
-        <div class="logo">CAR<span>MEX</span></div>
+        <div class="logo">CAR<span>MIX</span></div>
         <nav class="nav-menu">
             <a href="#home">الرئيسية</a>
             <a href="#services">الخدمات</a>
@@ -255,7 +207,7 @@
     <section class="hero" id="home">
         <div class="hero-shape"></div>
         <div class="hero-text">
-            <h1 style="font-style: italic;">CAR<span>MEX</span><br>رعاية احترافية</h1>
+            <h1 style="font-style: italic;">CAR<span>MIX</span><br>رعاية احترافية</h1>
             <p>نقدم لك في كارمكس مستوى جديد كلياً من العناية. دقة هندسية، قطع غيار أصلية، وضمان يريح بالك.</p>
             <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: center;">
                 <a href="#services" class="cta-btn"><span>اكتشف خدماتنا</span></a>
@@ -304,18 +256,18 @@
             
             <div class="service-card-tall">
                 <div class="service-overlay">
-                    <h3>تلميع ونانو</h3>
-                    <p>غسيل VIP، تلميع داخلي وخارجي، وطبقات حماية نانو سيراميك لاستعادة لمعان الوكالة.</p>
+                    <h3>كهرباء سيارات</h3>
+                    <p>فحص كمبيوتر شامل، برمجة الحساسات والكنترولات، إصلاح الظفائر والأعطال الكهربائية المعقدة.</p>
                 </div>
-                <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop" alt="Detailing">
+                <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop" alt="Auto Electric Diagnostic">
             </div>
             
             <div class="service-card-tall">
                 <div class="service-overlay">
-                    <h3>كهرباء وبرمجة</h3>
-                    <p>تشخيص أعطال الكمبيوتر، برمجة الحساسات، وإصلاح الضفائر والأنظمة الإلكترونية المعقدة.</p>
+                    <h3>تلميع ونانو</h3>
+                    <p>غسيل VIP، تلميع داخلي وخارجي، وطبقات حماية نانو سيراميك لاستعادة لمعان الوكالة.</p>
                 </div>
-                <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=800&auto=format&fit=crop" alt="Electric">
+                <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop" alt="Detailing">
             </div>
             
             <div class="service-card-tall">
@@ -351,16 +303,16 @@
                     <select name="service_type" class="form-input">
                         <option value="صيانة دورية">صيانة دورية (زيت وفلاتر)</option>
                         <option value="ميكانيكا وإصلاح">ميكانيكا وإصلاح أعطال</option>
+                        <option value="كهرباء سيارات">كهرباء وفحص كمبيوتر</option>
                         <option value="سمكرة ودهان">سمكرة ودهان</option>
                         <option value="تلميع ونانو">تلميع ونانو سيراميك</option>
-                        <option value="فحص شامل">فحص وبرمجة كمبيوتر</option>
+                        <option value="فحص شامل">فحص شامل</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>رقم الجوال</label>
                     <input type="tel" name="phone" class="form-input" placeholder="05xxxxxxxx" required>
                 </div>
-                
                 <button type="submit" class="cta-btn" style="width:100%; border:none; cursor:pointer;"><span>تأكيد وإرسال الطلب</span></button>
                 
                 <div class="divider">أو</div>
@@ -369,7 +321,6 @@
                     <i class="fab fa-whatsapp"></i>
                     <span>احجز مباشرة عبر واتساب</span>
                 </a>
-
             </form>
         </div>
     </section>
@@ -393,10 +344,10 @@
                 <ul><li>توضيب المحركات.</li><li>إصلاح مشاكل القير الأوتوماتيك.</li><li>صيانة نظام التعليق والعضلات.</li></ul>
             </div>
             <div class="detailed-card">
-                <div class="d-icon"><i class="fas fa-laptop-code"></i></div>
-                <h3>فحص وبرمجة</h3>
-                <p>تشخيص دقيق للأعطال الإلكترونية.</p>
-                <ul><li>فحص شامل بالكمبيوتر.</li><li>برمجة الثروتل والحساسات.</li><li>إطفاء لمبات التحذير.</li></ul>
+                <div class="d-icon"><i class="fas fa-bolt"></i></div>
+                <h3>كهرباء وبرمجة</h3>
+                <p>تشخيص وإصلاح كافة الأعطال الكهربائية.</p>
+                <ul><li>فحص شامل بالكمبيوتر (أونلاين).</li><li>برمجة الوحدات الإلكترونية (ECU/TCU).</li><li>إصلاح الضفائر والحساسات.</li></ul>
             </div>
             <div class="detailed-card">
                 <div class="d-icon"><i class="fas fa-gem"></i></div>
@@ -422,7 +373,7 @@
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
-                <h2>CAR<span>MEX</span> <i class="fas fa-bolt" style="color:var(--accent-color); font-size:1.5rem;"></i></h2>
+                <h2>CAR<span>MIX</span> <i class="fas fa-bolt" style="color:var(--accent-color); font-size:1.5rem;"></i></h2>
                 <p>مركز متكامل في القصيم، عنيزة. نقدم أفضل تجربة صيانة للسيارات باستخدام أحدث التقنيات.</p>
                 <div class="social-icons">
                     <a href="https://www.instagram.com/carmix.sa?igsh=MWNqcHlnaGZpems0MA%3D%3D&utm_source=qr" target="_blank" class="social-btn">
@@ -462,7 +413,6 @@
                 <h3>تواصل معنا</h3>
                 
                 <div class="contact-list-container">
-                    
                     <a href="https://maps.app.goo.gl/68YuZ11RvKuqhPWw9" target="_blank" class="contact-link">
                         <div class="contact-item">
                             <div class="c-icon-box">
