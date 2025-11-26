@@ -9,190 +9,341 @@
     
     <style>
         /* =========================================
-           1. الأساسيات
+           1. الأساسيات ومتغيرات التصميم
            ========================================= */
         :root {
             --main-dark: #0f172a;        
             --secondary-dark: #1e293b;   
             --accent-color: #f59e0b;     
+            --accent-glow: rgba(245, 158, 11, 0.5);
             --text-light: #f1f5f9;
-            --border-glass: rgba(255, 255, 255, 0.1);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(30, 41, 59, 0.7);
             --whatsapp-color: #25D366;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; scroll-behavior: smooth; }
-        body { background-color: var(--main-dark); color: var(--text-light); overflow-x: hidden; }
+        body { background-color: var(--main-dark); color: var(--text-light); overflow-x: hidden; position: relative; }
+        
+        /* تحسين شريط التمرير */
+        ::-webkit-scrollbar { width: 10px; background: var(--main-dark); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(var(--accent-color), #d97706); border-radius: 10px; border: 2px solid var(--main-dark); }
+
+        /* شاشة التحميل */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--main-dark); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .loader.hidden { opacity: 0; visibility: hidden; }
+        .spinner {
+            width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-color); border-radius: 50%;
+            animation: spin 1s linear infinite, glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes glow { from { box-shadow: 0 0 10px var(--accent-glow); } to { box-shadow: 0 0 30px var(--accent-glow), 0 0 10px var(--accent-color); } }
+        
+        /* زر الصعود للأعلى */
+        #scrollTopBtn {
+            position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px;
+            background: var(--accent-color); color: #fff; border: none; border-radius: 50%;
+            cursor: pointer; display: none; align-items: center; justify-content: center;
+            font-size: 1.2rem; z-index: 900; box-shadow: 0 5px 15px var(--accent-glow);
+            transition: 0.3s; animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
 
         /* =========================================
            2. الهيدر
            ========================================= */
         header {
-            position: fixed; top: 0; width: 100%; z-index: 1000; padding: 15px 5%;
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            position: fixed; top: 0; width: 100%; z-index: 1000; padding: 20px 5%;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(25px) saturate(1.5);
             border-bottom: 1px solid var(--border-glass);
             display: flex; justify-content: space-between; align-items: center;
+            transition: 0.4s;
         }
-        .logo { font-size: 2rem; font-weight: 800; letter-spacing: 1px; color: #fff; font-style: italic; }
+        header.scrolled { padding: 12px 5%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .logo { font-size: 2.2rem; font-weight: 800; color: #fff; font-style: italic; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .logo span { color: var(--accent-color); }
         
-        .nav-menu { display: flex; gap: 30px; }
-        .nav-menu a { color: #cbd5e1; text-decoration: none; font-weight: 500; transition: 0.3s; }
-        .nav-menu a:hover { color: var(--accent-color); }
-        
-        @media (max-width: 768px) {
-            .nav-menu { display: none; }
-        }
+        .nav-menu { display: flex; gap: 35px; }
+        .nav-menu a { color: #cbd5e1; text-decoration: none; font-weight: 500; transition: 0.3s; position: relative; font-size: 1.05rem; }
+        .nav-menu a::after { content: ''; position: absolute; bottom: -5px; right: 0; width: 0; height: 2px; background: var(--accent-color); transition: 0.3s; }
+        .nav-menu a:hover { color: #fff; }
+        .nav-menu a:hover::after { width: 100%; left: 0; }
 
         .cta-btn {
             background: linear-gradient(135deg, var(--accent-color), #d97706);
-            color: #000; padding: 10px 30px; border-radius: 4px; text-decoration: none; font-weight: 800;
-            transition: 0.3s; transform: skewX(-10deg); display: inline-block; cursor: pointer; border: none;
+            color: #000; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 800;
+            transition: 0.3s; transform: skewX(-10deg); display: inline-block; border: none; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3); position: relative; overflow: hidden;
         }
+        .cta-btn::before { content: ''; position: absolute; top:0; left:-100%; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition:0.5s; }
+        .cta-btn:hover::before { left:100%; }
         .cta-btn span { display: block; transform: skewX(10deg); }
-        .cta-btn:hover { background: #fff; color: #000; transform: skewX(-10deg) translateY(-2px); }
+        .cta-btn:hover { transform: skewX(-10deg) translateY(-3px); box-shadow: 0 15px 30px var(--accent-glow); color: #fff; }
 
         /* =========================================
-           3. المحتوى الرئيسي
+           3. المحتوى الرئيسي وتجميل الهيرو
            ========================================= */
         .hero {
-            min-height: 100vh; position: relative; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 5%; overflow: hidden;
-            background: radial-gradient(circle at 20% 50%, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: space-between;
+            padding: 80px 5% 150px;
+            background: radial-gradient(circle at 30% 30%, #233045 0%, var(--main-dark) 70%);
+            position: relative; overflow: hidden;
         }
-        .hero-shape {
-            position: absolute; top: 0; left: -20%; width: 60%; height: 100%;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), transparent);
-            transform: skewX(-20deg); z-index: 0;
+        .hero::before { content: ''; position: absolute; top: -10%; right: -10%; width: 50%; height: 50%; background: var(--accent-color); filter: blur(150px); opacity: 0.15; animation: pulse 5s infinite alternate; }
+        @keyframes pulse { 0% { opacity: 0.1; transform: scale(1); } 100% { opacity: 0.2; transform: scale(1.1); } }
+
+        .hero-text { width: 45%; z-index: 2; animation: slideInRight 1s ease-out; }
+        .hero-text h1 { font-size: 4.5rem; margin-bottom: 25px; color: #fff; line-height: 1.1; }
+        .hero-text h1 span { color: transparent; -webkit-text-stroke: 2px var(--accent-color); position: relative; display: inline-block; }
+        .hero-text h1 span::after { content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 8px; background: var(--accent-color); opacity: 0.3; z-index: -1; transform: skewX(-20deg); }
+        .hero-text p { font-size: 1.3rem; color: #cbd5e1; margin-bottom: 45px; line-height: 1.8; max-width: 90%; }
+        
+        .hero-image { width: 50%; z-index: 2; display: flex; justify-content: center; perspective: 1000px; animation: slideInLeft 1s ease-out; }
+        .hero-image img { 
+            width: 100%; max-width: 700px; border-radius: 30px; 
+            box-shadow: 0 30px 70px rgba(0,0,0,0.6); 
+            transform: rotateY(-5deg) rotateX(5deg); transition: 0.5s;
+            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
         }
-        .hero-text { width: 45%; z-index: 2; }
-        .hero-text h1 { font-size: 4.5rem; line-height: 1; margin-bottom: 20px; color: #fff; text-transform: uppercase; }
-        .hero-text h1 span { color: transparent; -webkit-text-stroke: 2px var(--accent-color); }
-        .hero-text p { font-size: 1.2rem; color: #94a3b8; margin-bottom: 40px; line-height: 1.8; }
-        .hero-image { width: 55%; position: relative; z-index: 2; display: flex; justify-content: center; }
-        .hero-image img { width: 100%; max-width: 700px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .hero-image:hover img { transform: rotateY(0) rotateX(0) scale(1.02); }
+
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* فاصل منحني */
+        .custom-shape-divider-bottom {
+            position: absolute; bottom: 0; left: 0; width: 100%; overflow: hidden; line-height: 0; z-index: 3;
+        }
+        .custom-shape-divider-bottom svg { position: relative; display: block; width: calc(136% + 1.3px); height: 150px; transform: rotate(180deg); }
+        .custom-shape-divider-bottom .shape-fill { fill: var(--secondary-dark); }
 
         /* شريط المميزات */
         .features-strip {
-            display: flex; justify-content: center; gap: 30px; padding: 40px; margin-top: -80px; position: relative; z-index: 5; flex-wrap: wrap;
+            display: flex; justify-content: center; gap: 35px; padding: 0 5%; 
+            margin-top: -80px; 
+            position: relative; z-index: 10; flex-wrap: wrap;
         }
         .feature-box {
-            background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(15px); border: 1px solid var(--border-glass);
-            padding: 25px; border-radius: 10px; width: 280px; text-align: center; color: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.4s;
+            background: rgba(30, 41, 59, 0.75); backdrop-filter: blur(20px); 
+            border: 1px solid var(--border-glass); padding: 35px 25px; 
+            border-radius: 20px; width: 300px; text-align: center; color: #fff;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: 0.4s; 
+            position: relative; overflow: hidden;
         }
-        .feature-box:hover { transform: translateY(-5px); border-color: var(--accent-color); }
-        .feature-box i { font-size: 2rem; color: var(--accent-color); margin-bottom: 15px; }
+        .feature-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--accent-color), transparent); transform: scaleX(0); transition: 0.4s; }
+        .feature-box:hover::before { transform: scaleX(1); }
+        .feature-box:hover { transform: translateY(-15px); background: rgba(30, 41, 59, 0.9); }
+        .feature-box i { font-size: 3rem; color: var(--accent-color); margin-bottom: 20px; display: inline-block; transition: 0.3s; text-shadow: 0 0 20px var(--accent-glow); }
+        .feature-box:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-box h3 { font-size: 1.4rem; margin-bottom: 15px; }
+        .feature-box p { color: #cbd5e1; line-height: 1.6; }
 
         /* =========================================
            4. قسم الخدمات
            ========================================= */
-        .services-section { padding: 120px 5%; background-color: var(--secondary-dark); position: relative; }
-        .section-header { margin-bottom: 60px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
-        .section-header h2 { font-size: 3rem; color: #fff; position: relative; padding-right: 20px; margin: 0; }
-        .section-header h2::before { content: ''; position: absolute; right: 0; top: 10px; height: 70%; width: 5px; background: var(--accent-color); }
-        .view-all-link { color: #fff; text-decoration: none; border-bottom: 2px solid var(--accent-color); padding-bottom: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .view-all-link:hover { color: var(--accent-color); }
-        .services-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 40px; scrollbar-width: none; }
-        .services-container::-webkit-scrollbar { display: none; }
-        .service-card-tall { min-width: 300px; height: 400px; position: relative; border-radius: 15px; overflow: hidden; cursor: pointer; transition: 0.5s; flex-shrink: 0; border: 1px solid #333; background: #000; }
-        .service-card-tall img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .service-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.7) 60%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 30px 20px; transform: translateY(0); height: 50%; }
-        .service-overlay h3 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); border-right: 4px solid var(--accent-color); padding-right: 10px; }
-        .service-overlay p { opacity: 1; font-size: 1rem; color: #e2e8f0; line-height: 1.5; transform: translateY(0); }
-        .service-card-tall:hover { min-width: 340px; border-color: var(--accent-color); }
-        .service-card-tall:hover img { transform: scale(1.05); }
-        .service-card-tall:hover .service-overlay { background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(15,23,42,0.8) 100%); }
-
-        /* =========================================
-           5. قسم الحجز
-           ========================================= */
-        .booking-section { padding: 80px 5%; background: var(--main-dark); border-top: 1px solid #333; }
-        .booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .booking-form { background: var(--secondary-dark); padding: 40px; border-radius: 15px; border: 1px solid #334155; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: #cbd5e1; margin-bottom: 8px; font-weight: bold; }
-        .form-input { width: 100%; padding: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 5px; color: #fff; outline: none; transition: 0.3s; }
-        .form-input:focus { border-color: var(--accent-color); }
-        .booking-info-list { list-style: none; padding: 0; }
-        .booking-info-list li { margin-bottom: 15px; color: #94a3b8; display: flex; align-items: center; font-size: 1.1rem; }
-        .booking-info-list i { color: var(--accent-color); margin-left: 10px; font-size: 1.2rem; }
-
-        .whatsapp-btn {
-            background: var(--whatsapp-color); color: #fff; width: 100%; padding: 12px; border-radius: 4px;
-            text-decoration: none; font-weight: 800; display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-top: 20px; transform: skewX(-10deg); transition: 0.3s; border: none; cursor: pointer;
+        .services-section { padding: 150px 5% 100px; background-color: var(--secondary-dark); position: relative; }
+        .section-header { margin-bottom: 60px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .section-header h2 { font-size: 3rem; color: #fff; position: relative; padding-right: 25px; }
+        .section-header h2::before { content: ''; position: absolute; right: 0; top: 15%; height: 70%; width: 6px; background: var(--accent-color); border-radius: 10px; box-shadow: 0 0 15px var(--accent-glow); }
+        
+        .view-all-link {
+            color: #cbd5e1; text-decoration: none; padding: 12px 25px;
+            border: 1px solid var(--border-glass); border-radius: 30px;
+            font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px;
+            background: var(--glass-bg); backdrop-filter: blur(10px);
         }
-        .whatsapp-btn span { transform: skewX(10deg); font-size: 1.1rem; }
-        .whatsapp-btn i { transform: skewX(10deg); font-size: 1.3rem; }
-        .whatsapp-btn:hover { background: #128C7E; transform: skewX(-10deg) translateY(-3px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+        .view-all-link:hover { background: var(--accent-color); color: #fff; border-color: transparent; box-shadow: 0 0 20px var(--accent-glow); }
 
-        .divider { text-align: center; margin: 15px 0; color: #64748b; font-size: 0.9rem; position: relative; }
-        .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: #334155; }
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
+        .services-container { display: flex; gap: 35px; overflow-x: auto; padding: 20px 0 50px; scrollbar-width: none; }
+        .services-container::-webkit-scrollbar { display: none; }
+
+        .service-card-tall {
+            min-width: 340px; background: #222f46;
+            border-radius: 25px; overflow: hidden;
+            border: 1px solid var(--border-glass); transition: 0.4s ease-in-out;
+            cursor: pointer; display: flex; flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .service-image-box { width: 100%; height: 240px; position: relative; overflow: hidden; }
+        .service-image-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .service-content-box { padding: 30px; display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; background: linear-gradient(to bottom, #222f46, #1a2436); }
+        .service-title { font-size: 1.6rem; color: #fff; font-weight: 800; margin-bottom: 12px; position: relative; }
+        .service-title::after { content: ''; display: block; width: 50px; height: 3px; background: var(--accent-color); margin-top: 8px; border-radius: 2px; transition: 0.3s; }
+        .service-desc { font-size: 1.05rem; color: #cbd5e1; line-height: 1.7; }
+        
+        .card-badge { position: absolute; top: 20px; right: 20px; background: rgba(245, 158, 11, 0.95); color: #000; padding: 6px 15px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; z-index: 3; box-shadow: 0 5px 15px rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
+        .badge-vip { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+
+        .service-card-tall:hover { transform: translateY(-15px); border-color: var(--accent-color); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .service-card-tall:hover img { transform: scale(1.1); }
+        .service-card-tall:hover .service-title::after { width: 100px; box-shadow: 0 0 10px var(--accent-glow); }
 
         /* =========================================
-           6. الفوتر
+           5. قسم المعلومات (الأسئلة الشائعة وأوقات الدوام)
            ========================================= */
-        footer { background-color: #050505; padding: 80px 5% 30px; color: #fff; border-top: 1px solid #1e293b; }
-        .footer-grid { display: grid; grid-template-columns: 1.2fr 0.8fr 0.8fr 1.2fr; gap: 40px; margin-bottom: 60px; align-items: start; }
-        .footer-brand h2 { font-size: 2rem; font-weight: 800; margin-bottom: 20px; font-style: italic; }
-        .footer-brand h2 span { color: var(--accent-color); }
-        .footer-brand p { color: #94a3b8; line-height: 1.8; margin-bottom: 25px; font-size: 0.95rem; }
-        .social-icons { display: flex; gap: 10px; }
-        .social-btn { width: 40px; height: 40px; border: 1px solid #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; transition: 0.3s; }
-        .social-btn:hover { background: var(--accent-color); border-color: var(--accent-color); color: #000; }
-        .footer-col h3 { font-size: 1.2rem; margin-bottom: 25px; color: #fff; font-weight: 700; }
-        .footer-links { list-style: none; padding: 0; }
-        .footer-links li { margin-bottom: 15px; }
-        .footer-links a { color: #cbd5e1; text-decoration: none; transition: 0.3s; display: flex; align-items: center; font-size: 0.95rem; }
-        .footer-links a::before { content: '\f104'; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-left: 10px; font-size: 0.8rem; color: var(--accent-color); }
+        .info-section { padding: 80px 5%; background-color: #162032; border-top: 1px solid var(--border-glass); }
+        .info-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; align-items: start; }
+        
+        .info-title { font-size: 2rem; color: #fff; margin-bottom: 30px; border-right: 4px solid var(--accent-color); padding-right: 15px; }
+        
+        /* الأسئلة الشائعة */
+        .faq-container { display: flex; flex-direction: column; gap: 20px; }
+        .faq-box { background: var(--main-dark); padding: 25px; border-radius: 15px; border: 1px solid var(--border-glass); transition: 0.3s; }
+        .faq-box:hover { border-color: var(--accent-color); transform: translateX(-5px); }
+        .faq-question { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 10px; display: flex; align-items: center; }
+        .faq-question i { color: var(--accent-color); margin-left: 10px; font-size: 1.1rem; }
+        .faq-answer { color: #94a3b8; line-height: 1.6; font-size: 1rem; padding-right: 28px; }
+
+        /* أوقات الدوام */
+        .hours-card { background: linear-gradient(145deg, #1e293b, #0f172a); padding: 30px; border-radius: 20px; border: 1px solid var(--accent-color); box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+        .hours-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 60%); pointer-events: none; }
+        .hours-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid var(--border-glass); padding-bottom: 15px; }
+        .hours-header i { font-size: 2rem; color: var(--accent-color); }
+        .hours-header h3 { font-size: 1.5rem; color: #fff; margin: 0; }
+        .hours-list { list-style: none; padding: 0; }
+        .hours-list li { display: flex; justify-content: space-between; margin-bottom: 15px; color: #cbd5e1; font-size: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        .hours-list li:last-child { border: none; margin-bottom: 0; }
+        .day-name { font-weight: bold; color: #fff; }
+        .time-range { color: var(--accent-color); font-family: 'Tajawal', sans-serif; font-weight: 500; direction: ltr; }
+
+        /* =========================================
+           6. قسم الحجز
+           ========================================= */
+        .booking-section { padding: 100px 5%; background: var(--main-dark); position: relative; }
+        
+        .booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .booking-text h2 { font-size: 3.5rem; line-height: 1.2; margin-bottom: 25px; }
+        
+        .booking-form { background: var(--glass-bg); backdrop-filter: blur(25px); padding: 50px; border-radius: 25px; border: 1px solid var(--border-glass); box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; color: #cbd5e1; margin-bottom: 12px; font-weight: bold; font-size: 1.05rem; }
+        .form-input { width: 100%; padding: 18px; background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; transition: 0.3s; font-size: 1rem; }
+        .form-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); background: rgba(15, 23, 42, 0.8); }
+
+        .booking-info-list li { margin-bottom: 20px; color: #cbd5e1; display: flex; align-items: center; font-size: 1.15rem; background: rgba(255,255,255,0.03); padding: 15px 20px; border-radius: 15px; border: 1px solid transparent; transition: 0.3s; }
+        .booking-info-list li:hover { border-color: var(--accent-color); background: rgba(245, 158, 11, 0.05); transform: translateX(-10px); }
+        .booking-info-list i { color: var(--accent-color); margin-left: 15px; font-size: 1.4rem; background: rgba(245, 158, 11, 0.15); padding: 10px; border-radius: 50%; }
+
+        .whatsapp-btn { background: var(--whatsapp-color); color: #fff; width: 100%; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 25px; transition: 0.3s; border: none; cursor: pointer; font-size: 1.1rem; }
+        .whatsapp-btn:hover { background: #128C7E; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3); }
+        .divider { text-align: center; margin: 30px 0; color: #64748b; font-size: 1rem; position: relative; }
+        .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: #334155; }
+        .divider::before { left: 0; } .divider::after { right: 0; }
+
+        /* =========================================
+           7. الفوتر
+           ========================================= */
+        footer { background-color: #050505; padding: 80px 5% 30px; color: #fff; position: relative; border-top: 1px solid #333; }
+        footer::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--accent-color), #d97706, var(--accent-color)); background-size: 200% auto; animation: gradientMove 5s linear infinite; }
+        @keyframes gradientMove { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+        /* تعديل الشبكة لتصبح 3 أعمدة بدلاً من 4 */
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1.5fr; gap: 50px; margin-bottom: 60px; align-items: start; }
+        .footer-brand h2 { font-size: 2.2rem; margin-bottom: 25px; font-style: italic; }
+        .social-icons { display: flex; gap: 12px; }
+        .social-btn { width: 45px; height: 45px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; transition: 0.3s; background: rgba(255,255,255,0.05); font-size: 1.2rem; }
+        .social-btn:hover { background: var(--accent-color); border-color: var(--accent-color); color: #000; transform: translateY(-5px); box-shadow: 0 5px 15px var(--accent-glow); }
+
+        .footer-col h3 { font-size: 1.3rem; margin-bottom: 30px; color: #fff; font-weight: 700; position: relative; display: inline-block; }
+        .footer-col h3::after { content: ''; position: absolute; bottom: -10px; right: 0; width: 40px; height: 3px; background: var(--accent-color); border-radius: 2px; }
+        .footer-links li { margin-bottom: 18px; }
+        .footer-links a { color: #cbd5e1; text-decoration: none; transition: 0.3s; display: inline-block; }
         .footer-links a:hover { color: var(--accent-color); transform: translateX(-5px); }
-        .contact-list-container { display: flex; flex-direction: column; gap: 25px; }
-        .contact-link { text-decoration: none; display: block; transition: 0.3s; }
-        .contact-link:hover .c-icon-box { transform: scale(1.1); }
-        .contact-link:hover .c-value { color: var(--accent-color); }
-        .contact-item { display: flex; align-items: center; gap: 15px; width: 100%; }
-        .c-icon-box { width: 55px; height: 55px; background-color: var(--accent-color); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; flex-shrink: 0; transition: 0.3s; }
-        .c-text { display: flex; flex-direction: column; justify-content: center; text-align: right; }
-        .c-label { font-weight: 800; color: #fff; margin-bottom: 5px; font-size: 1.1rem; }
+        
+        /* تنسيق عناصر التواصل */
+        .contact-item { display: flex; align-items: center; gap: 18px; width: 100%; margin-bottom: 25px; position: relative; }
+        
+        .c-icon-box { 
+            width: 55px; height: 55px; 
+            background-color: rgba(245, 158, 11, 0.15); 
+            border-radius: 15px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.4rem; color: var(--accent-color); 
+            flex-shrink: 0; transition: 0.3s; 
+            border: 1px solid rgba(245, 158, 11, 0.2); 
+        }
+
+        .c-text { display: flex; flex-direction: column; }
+        .c-label { font-weight: 800; color: #fff; margin-bottom: 5px; font-size: 1.05rem; }
         .c-value { color: #cbd5e1; font-size: 0.95rem; font-family: 'Tajawal', sans-serif; transition: 0.3s; }
-        .c-value.en-font { font-family: sans-serif; letter-spacing: 0.5px; direction: ltr; text-align: right; }
-        .copyright { text-align: center; border-top: 1px solid #1e293b; padding-top: 25px; color: #64748b; font-size: 0.9rem; }
+        .c-value.en-font { font-family: sans-serif; direction: ltr; text-align: right; }
 
+        /* تأثير التحويم على أيقونة الموقع والهاتف */
+        .contact-link { text-decoration: none; display: block; }
+        .contact-link:hover .c-icon-box { background: var(--accent-color); color: #fff; box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* الانبثاقة (Tooltip) لأيقونة الموقع */
+        .contact-link[href*="maps"] .c-icon-box::before {
+            content: 'افتح على خرائط جوجل';
+            position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px);
+            background: var(--accent-color); color: #000; padding: 8px 15px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: bold; white-space: nowrap; opacity: 0; visibility: hidden; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; box-shadow: 0 5px 15px var(--accent-glow);
+        }
+        /* الانبثاقة (Tooltip) لأيقونة الهاتف */
+        .contact-link[href*="tel"] .c-icon-box::before {
+            content: 'اتصل الآن';
+            position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px);
+            background: var(--accent-color); color: #000; padding: 8px 15px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: bold; white-space: nowrap; opacity: 0; visibility: hidden; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        /* السهم الصغير للانبثاقة */
+        .contact-link .c-icon-box::after {
+            content: ''; position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%) translateY(10px);
+            border: 8px solid transparent; border-top-color: var(--accent-color); opacity: 0; visibility: hidden; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .contact-link:hover .c-icon-box::before,
+        .contact-link:hover .c-icon-box::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+        /* حقوق الملكية */
+        .copyright { text-align: center; border-top: 1px solid #1e293b; padding-top: 25px; color: #64748b; font-size: 0.9rem; line-height: 1.8; }
+        
         /* =========================================
-           7. الشاشة المنبثقة للخدمات
+           8. النوافذ المنبثقة
            ========================================= */
-        .full-services-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.98); z-index: 3000; display: none; opacity: 0; transition: opacity 0.4s ease; overflow-y: auto; padding: 50px 5%; }
+        .full-services-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.98); backdrop-filter: blur(30px); z-index: 3000; display: none; opacity: 0; transition: all 0.4s ease; overflow-y: auto; padding: 60px 5%; }
         .full-services-overlay.active { display: block; opacity: 1; }
-        .overlay-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; border-bottom: 1px solid #334155; padding-bottom: 20px; }
-        .close-overlay { font-size: 3rem; color: #94a3b8; cursor: pointer; transition: 0.3s; }
-        .close-overlay:hover { color: var(--accent-color); }
-        .services-grid-detailed { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .detailed-card { background: #1e293b; padding: 30px; border-radius: 12px; border: 1px solid #334155; transition: 0.3s; display: flex; flex-direction: column; align-items: flex-start; }
-        .detailed-card:hover { border-color: var(--accent-color); transform: translateY(-5px); }
-        .d-icon { width: 60px; height: 60px; background: rgba(245, 158, 11, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--accent-color); margin-bottom: 20px; }
-        .detailed-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: #fff; }
-        .detailed-card p { color: #94a3b8; line-height: 1.7; font-size: 1rem; margin-bottom: 20px; }
-        .detailed-card ul { list-style: none; width: 100%; margin-top: auto; padding: 0; }
-        .detailed-card ul li { padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; font-size: 0.9rem; display: flex; align-items: center; }
-        .detailed-card ul li::before { content: '•'; color: var(--accent-color); margin-left: 10px; font-size: 1.5rem; line-height: 0; }
+        .overlay-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 60px; border-bottom: 1px solid var(--border-glass); padding-bottom: 30px; }
+        .close-overlay { font-size: 3rem; color: #cbd5e1; cursor: pointer; transition: 0.3s; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.05); }
+        .close-overlay:hover { color: #fff; background: var(--accent-color); transform: rotate(90deg); }
+        
+        .services-grid-detailed { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; }
+        .detailed-card { background: rgba(30, 41, 59, 0.6); padding: 40px; border-radius: 25px; border: 1px solid var(--border-glass); transition: 0.4s; display: flex; flex-direction: column; align-items: flex-start; position: relative; overflow: hidden; }
+        .detailed-card::before { content: ''; position: absolute; top: 0; right: 0; width: 5px; height: 0; background: var(--accent-color); transition: 0.5s; }
+        .detailed-card:hover::before { height: 100%; }
+        .detailed-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); background: rgba(30, 41, 59, 0.8); }
+        .d-icon { width: 70px; height: 70px; background: rgba(245, 158, 11, 0.15); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--accent-color); margin-bottom: 25px; border: 1px solid rgba(245, 158, 11, 0.2); text-shadow: 0 0 15px var(--accent-glow); }
+        .detailed-card h3 { font-size: 1.6rem; margin-bottom: 15px; color: #fff; }
+        .detailed-card ul li { margin-bottom: 12px; display: flex; align-items: center; color: #cbd5e1; }
+        .detailed-card ul li::before { content: '•'; color: var(--accent-color); font-size: 1.5rem; margin-left: 10px; line-height: 0; }
 
-        @media screen and (max-width: 900px) {
-            .hero { flex-direction: column; padding-top: 120px; text-align: center; justify-content: center; }
+        @media (max-width: 900px) {
+            .hero { flex-direction: column; text-align: center; padding-top: 120px; }
             .hero-text { width: 100%; margin-bottom: 50px; }
-            .hero-image { width: 100%; }
-            .booking-grid { grid-template-columns: 1fr; }
-            .section-header h2 { font-size: 2rem; }
+            .hero-image { width: 90%; }
+            .features-strip { margin-top: -50px; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .info-grid { grid-template-columns: 1fr; gap: 40px; }
+            .booking-grid { grid-template-columns: 1fr; gap: 50px; }
             .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; }
-            .contact-item { justify-content: center; }
-            .c-text { text-align: right; }
-            .footer-links a { justify-content: center; }
-            .social-icons { justify-content: center; }
+            .contact-item { justify-content: center; } .social-icons { justify-content: center; } .c-text { text-align: right; }
         }
     </style>
 </head>
 <body>
+
+    <div class="loader"><div class="spinner"></div></div>
+
+    <button id="scrollTopBtn"><i class="fas fa-arrow-up"></i></button>
 
     <header>
         <div class="logo">CAR<span>MIX</span></div>
@@ -205,90 +356,162 @@
     </header>
 
     <section class="hero" id="home">
-        <div class="hero-shape"></div>
         <div class="hero-text">
-            <h1 style="font-style: italic;">CAR<span>MIX</span><br>رعاية احترافية</h1>
-            <p>نقدم لك في كارمكس مستوى جديد كلياً من العناية. دقة هندسية، قطع غيار أصلية، وضمان يريح بالك.</p>
-            <div style="display: flex; gap: 15px; margin-top: 20px; justify-content: center;">
+            <h1>CAR<span>MIX</span><br>رعاية احترافية</h1>
+            <p>نقدم لك في كارمكس مستوى جديد كلياً من العناية. دقة هندسية، قطع غيار أصلية، وضمان يريح بالك. نحن نعتني بسيارتك كما لو كانت سيارتنا.</p>
+            <div style="display: flex; gap: 20px; justify-content: flex-start;">
                 <a href="#services" class="cta-btn"><span>اكتشف خدماتنا</span></a>
             </div>
         </div>
         <div class="hero-image">
             <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1000&auto=format&fit=crop" alt="Luxury Car">
         </div>
+        
+        <div class="custom-shape-divider-bottom">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M985.66,92.83C906.67,72,823.78,31.3,748.66,28.42c-76.13-2.92-155.26,15.39-236.42,39.28C429.46,95,328.63,123.75,218,117.47,129.13,112.4,48.33,86.13,0,49.74V150H1200V86.7C1119.85,106.18,1064.65,113.66,985.66,92.83Z" class="shape-fill"></path>
+            </svg>
+        </div>
     </section>
 
     <div class="features-strip">
-        <div class="feature-box">
-            <i class="fas fa-check-double"></i>
-            <h3>جودة مضمونة</h3>
-            <p>نستخدم قطع غيار أصلية فقط مع ضمان شامل على العمل.</p>
-        </div>
-        <div class="feature-box">
-            <i class="fas fa-user-clock"></i>
-            <h3>التزام بالوقت</h3>
-            <p>جدول زمني دقيق لكل عملية صيانة لضمان التسليم.</p>
-        </div>
-        <div class="feature-box">
-            <i class="fas fa-tools"></i>
-            <h3>تقنيات متطورة</h3>
-            <p>أحدث أجهزة الفحص والتشخيص العالمية.</p>
-        </div>
+        <div class="feature-box"><i class="fas fa-check-double"></i><h3>جودة مضمونة</h3><p>قطع غيار أصلية 100% مع ضمان شامل على جميع الإصلاحات.</p></div>
+        <div class="feature-box"><i class="fas fa-user-clock"></i><h3>التزام بالوقت</h3><p>نحترم وقتك ونسلم السيارة في الموعد المحدد بدقة.</p></div>
+        <div class="feature-box"><i class="fas fa-tools"></i><h3>تقنيات متطورة</h3><p>نستخدم أحدث أجهزة الفحص والتشخيص المعتمدة عالمياً.</p></div>
     </div>
 
     <section class="services-section" id="services">
         <div class="section-header">
             <div>
-                <span style="color:var(--accent-color); font-weight:bold; letter-spacing:2px;">خدمات كارمكس</span>
+                <span style="color:var(--accent-color); font-weight:bold; letter-spacing: 2px; display: block; margin-bottom: 10px;">خدماتنا المتميزة</span>
                 <h2>حلول متكاملة لسيارتك</h2>
             </div>
             <a href="javascript:void(0)" id="view-all-btn" class="view-all-link">عرض التفاصيل الكاملة <i class="fas fa-arrow-left"></i></a>
         </div>
 
         <div class="services-container">
-            <div class="service-card-tall">
-                <div class="service-overlay">
-                    <h3>ميكانيكا عامة</h3>
-                    <p>صيانة شاملة للمحركات، توضيب القير، وفحص نظام التعليق والعضلات لضمان أداء مثالي.</p>
-                </div>
-                <img src="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?q=80&w=800&auto=format&fit=crop" alt="Mechanic">
-            </div>
             
             <div class="service-card-tall">
-                <div class="service-overlay">
-                    <h3>كهرباء سيارات</h3>
-                    <p>فحص كمبيوتر شامل، برمجة الحساسات والكنترولات، إصلاح الظفائر والأعطال الكهربائية المعقدة.</p>
+                <div class="service-image-box">
+                    <div class="card-badge"><i class="fas fa-check"></i> خدمة أساسية</div>
+                    <img src="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?q=80&w=800&auto=format&fit=crop" alt="Oil Change">
                 </div>
-                <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop" alt="Auto Electric Diagnostic">
+                <div class="service-content-box">
+                    <h3 class="service-title">الصيانة الدورية</h3>
+                    <p class="service-desc">تغيير زيوت وفلاتر أصلية مع فحص شامل للسوائل وتشحيم الأجزاء المتحركة لضمان الأداء.</p>
+                </div>
             </div>
-            
+
             <div class="service-card-tall">
-                <div class="service-overlay">
-                    <h3>تلميع ونانو</h3>
-                    <p>غسيل VIP، تلميع داخلي وخارجي، وطبقات حماية نانو سيراميك لاستعادة لمعان الوكالة.</p>
+                <div class="service-image-box">
+                    <div class="card-badge"><i class="fas fa-star"></i> الأكثر طلباً</div>
+                    <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop" alt="Diagnostics">
                 </div>
-                <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop" alt="Detailing">
+                <div class="service-content-box">
+                    <h3 class="service-title">كهرباء وفحص</h3>
+                    <p class="service-desc">فحص كمبيوتر بأحدث الأجهزة (2025) للكشف عن الأعطال وبرمجة الحساسات والكنترولات.</p>
+                </div>
             </div>
-            
+
             <div class="service-card-tall">
-                <div class="service-overlay">
-                    <h3>سمكرة ودهان</h3>
-                    <p>إصلاح الصدمات، تعديل البارد (PDR)، ورش فرن حراري بألوان مطابقة تماماً للمصنع.</p>
+                <div class="service-image-box">
+                    <div class="card-badge"><i class="fas fa-cogs"></i> ميكانيكا</div>
+                    <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800&auto=format&fit=crop" alt="Engine Repair">
                 </div>
-                <img src="https://images.unsplash.com/photo-1625047509168-a7026f36de04?q=80&w=800&auto=format&fit=crop" alt="Paint">
+                <div class="service-content-box">
+                    <h3 class="service-title">ميكانيكا وتوضيب</h3>
+                    <p class="service-desc">إصلاح شامل للمحركات وتوضيب القير بأيدي خبراء، وصيانة نظام التعليق والعضلات.</p>
+                </div>
             </div>
+
+             <div class="service-card-tall">
+                <div class="service-image-box">
+                    <div class="card-badge"><i class="fas fa-spray-can"></i> فرن حراري</div>
+                    <img src="https://images.unsplash.com/photo-1625047509168-a7026f36de04?q=80&w=800&auto=format&fit=crop" alt="Car Painting">
+                </div>
+                <div class="service-content-box">
+                    <h3 class="service-title">سمكرة ودهان</h3>
+                    <p class="service-desc">إصلاح الصدمات وتعديل الهيكل، ورش بوية في فرن حراري لضمان الجودة ومطابقة لون الوكالة.</p>
+                </div>
+            </div>
+
+            <div class="service-card-tall">
+                <div class="service-image-box">
+                    <div class="card-badge badge-vip"><i class="fas fa-crown"></i> باقات VIP</div>
+                    <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?q=80&w=800&auto=format&fit=crop" alt="Polishing Car">
+                </div>
+                <div class="service-content-box">
+                    <h3 class="service-title">تلميع ونانو</h3>
+                    <p class="service-desc">باقات تلميع داخلي وخارجي لإزالة الخدوش، مع تطبيق حماية نانو سيراميك لبريق يدوم طويلاً.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="info-section" id="faq"> <div class="info-grid">
+            
+            <div>
+                <h3 class="info-title">الأسئلة الشائعة</h3>
+                <div class="faq-container">
+                    <div class="faq-box">
+                        <div class="faq-question"><i class="fas fa-question-circle"></i> هل قطع الغيار المستخدمة أصلية؟</div>
+                        <div class="faq-answer">نعم، في كارمكس نلتزم باستخدام قطع الغيار الأصلية (OEM) أو المعتمدة من الوكالة لضمان الجودة والأداء.</div>
+                    </div>
+                    <div class="faq-box">
+                        <div class="faq-question"><i class="fas fa-question-circle"></i> هل يوجد ضمان على الإصلاحات؟</div>
+                        <div class="faq-answer">بكل تأكيد، نقدم ضماناً شاملاً على جميع أعمال الصيانة وقطع الغيار لراحة بالك.</div>
+                    </div>
+                    <div class="faq-box">
+                        <div class="faq-question"><i class="fas fa-question-circle"></i> هل يجب حجز موعد مسبق؟</div>
+                        <div class="faq-answer">نوصي بحجز موعد لضمان خدمتك بشكل أسرع وتجنب الانتظار، ويمكنك الحجز بسهولة عبر الموقع.</div>
+                    </div>
+                    <div class="faq-box">
+                        <div class="faq-question"><i class="fas fa-question-circle"></i> كم تستغرق عملية الصيانة الدورية؟</div>
+                        <div class="faq-answer">غالباً ما يتم الانتهاء من الصيانة الدورية (زيوت وفلاتر) في نفس اليوم خلال ساعات قليلة.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="hours-card">
+                    <div class="hours-header">
+                        <i class="far fa-clock"></i>
+                        <h3>أوقات العمل</h3>
+                    </div>
+                    <ul class="hours-list">
+                        <li>
+                            <span class="day-name">السبت - الثلاثاء</span>
+                            <span class="time-range">7:00 ص - 12:00 م  |  2:00 م - 9:00 م</span>
+                        </li>
+                        <li>
+                            <span class="day-name">الأربعاء</span>
+                            <span class="time-range">7:00 ص - 12:00 م  |  2:00 م - 9:00 م</span>
+                        </li>
+                        <li>
+                            <span class="day-name">الخميس</span>
+                            <span class="time-range">7:00 ص - 12:00 م  |  2:00 م - 9:00 م</span>
+                        </li>
+                        <li>
+                            <span class="day-name">الجمعة</span>
+                            <span class="time-range">9:00 ص - 11:00 ص  |  2:00 م - 9:00 م</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <section class="booking-section" id="booking">
         <div class="booking-grid">
             <div class="booking-text">
-                <h2 style="font-size:3rem; color:#fff; line-height:1.2;">احجز موعدك <br><span style="color:var(--accent-color)">أونلاين</span></h2>
-                <p style="color:#94a3b8; margin: 20px 0;">سجل بياناتك هنا وسيصلنا إيميل فوري بطلبك. سنتواصل معك لتأكيد الموعد بأسرع وقت.</p>
+                <h2 style="font-size:3.5rem; color:#fff; line-height:1.2;">احجز موعدك <br><span style="color:var(--accent-color); text-shadow: 0 0 20px var(--accent-glow);">أونلاين</span></h2>
+                <p style="color:#94a3b8; margin: 25px 0; font-size: 1.2rem;">سجل بياناتك هنا وسيصلنا إيميل فوري بطلبك. سنتواصل معك لتأكيد الموعد بأسرع وقت.</p>
                 <ul class="booking-info-list">
-                    <li><i class="fas fa-check-circle"></i> كشف أولي مجاني</li>
-                    <li><i class="fas fa-check-circle"></i> خصم 15% للحجوزات الأونلاين</li>
-                    <li><i class="fas fa-check-circle"></i> ضمان على جميع الإصلاحات</li>
+                    <li><i class="fas fa-check-circle"></i> كشف أولي مجاني عند الصيانة</li>
+                    <li><i class="fas fa-check-circle"></i> خصم خاص للحجوزات الأونلاين</li>
+                    <li><i class="fas fa-check-circle"></i> ضمان ذهبي على جميع الإصلاحات</li>
                 </ul>
             </div>
             
@@ -296,7 +519,7 @@
                 <input type="hidden" name="_subject" value="طلب حجز جديد من كارمكس">
                 <div class="form-group">
                     <label>نوع السيارة والموديل</label>
-                    <input type="text" name="car_model" class="form-input" placeholder="مثال: فورد توروس 2021" required>
+                    <input type="text" name="car_model" class="form-input" placeholder="مثال: فورد توروس 2023" required>
                 </div>
                 <div class="form-group">
                     <label>الخدمة المطلوبة</label>
@@ -313,7 +536,7 @@
                     <label>رقم الجوال</label>
                     <input type="tel" name="phone" class="form-input" placeholder="05xxxxxxxx" required>
                 </div>
-                <button type="submit" class="cta-btn" style="width:100%; border:none; cursor:pointer;"><span>تأكيد وإرسال الطلب</span></button>
+                <button type="submit" class="cta-btn" style="width:100%;"><span>تأكيد وإرسال الطلب</span></button>
                 
                 <div class="divider">أو</div>
                 
@@ -327,45 +550,45 @@
 
     <div id="full-services-overlay" class="full-services-overlay">
         <div class="overlay-header">
-            <h2 style="color:#fff;">دليل خدمات <span style="color:var(--accent-color)">كارمكس</span></h2>
+            <h2 style="color:#fff; font-size: 2.5rem;">دليل خدمات <span style="color:var(--accent-color)">كارمكس</span> الشامل</h2>
             <div class="close-overlay" id="close-overlay">×</div>
         </div>
         <div class="services-grid-detailed">
             <div class="detailed-card">
                 <div class="d-icon"><i class="fas fa-oil-can"></i></div>
                 <h3>الصيانة الدورية</h3>
-                <p>خدمة للحفاظ على عمر محرك سيارتك.</p>
-                <ul><li>تغيير زيت المحرك (تخليقي).</li><li>تغيير الفلاتر (زيت، هواء، مكيف).</li><li>فحص السوائل وتشحيم الأبواب.</li></ul>
+                <p>باقات صيانة مصممة للحفاظ على أداء محرك سيارتك وإطالة عمره الافتراضي.</p>
+                <ul><li>تغيير زيت المحرك (زيوت تخليقية معتمدة).</li><li>تغيير الفلاتر الأصلية (زيت، هواء، مكيف).</li><li>فحص وتزويد جميع السوائل.</li><li>تشحيم الأبواب والمفصلات.</li></ul>
             </div>
             <div class="detailed-card">
                 <div class="d-icon"><i class="fas fa-cogs"></i></div>
                 <h3>الميكانيكا الثقيلة</h3>
-                <p>إصلاح الأعطال المعقدة في المحرك والقير.</p>
-                <ul><li>توضيب المحركات.</li><li>إصلاح مشاكل القير الأوتوماتيك.</li><li>صيانة نظام التعليق والعضلات.</li></ul>
+                <p>حلول جذرية للأعطال الميكانيكية المعقدة في المحرك ونظام الحركة.</p>
+                <ul><li>توضيب المحركات بأحدث التقنيات.</li><li>إصلاح وصيانة القير الأوتوماتيك.</li><li>صيانة نظام التعليق (العضلات والمساعدات).</li><li>إصلاح نظام التوجيه (الدركسون).</li></ul>
             </div>
             <div class="detailed-card">
                 <div class="d-icon"><i class="fas fa-bolt"></i></div>
                 <h3>كهرباء وبرمجة</h3>
-                <p>تشخيص وإصلاح كافة الأعطال الكهربائية.</p>
-                <ul><li>فحص شامل بالكمبيوتر (أونلاين).</li><li>برمجة الوحدات الإلكترونية (ECU/TCU).</li><li>إصلاح الضفائر والحساسات.</li></ul>
+                <p>تشخيص دقيق وإصلاح لكافة الأعطال الكهربائية والإلكترونية.</p>
+                <ul><li>فحص شامل بالكمبيوتر (أجهزة الوكالة).</li><li>برمجة الوحدات الإلكترونية (ECU/TCU).</li><li>إصلاح الضفائر والحساسات التالفة.</li><li>برمجة المفاتيح والريموتات.</li></ul>
             </div>
             <div class="detailed-card">
                 <div class="d-icon"><i class="fas fa-gem"></i></div>
                 <h3>نانو وحماية</h3>
-                <p>حماية الطلاء ولمعان يدوم طويلاً.</p>
-                <ul><li>طبقات نانو سيراميك 9H.</li><li>حماية PPF للمقدمة.</li><li>تلميع مائي خارجي.</li></ul>
+                <p>أقصى درجات الحماية واللمعان لطلاء سيارتك باستخدام تكنولوجيا النانو.</p>
+                <ul><li>طبقات نانو سيراميك 9H (ضمان سنوات).</li><li>أفلام حماية PPF للمقدمة والمناطق المعرضة للخدش.</li><li>تلميع مائي خارجي وداخلي VIP.</li></ul>
             </div>
             <div class="detailed-card">
                 <div class="d-icon"><i class="fas fa-snowflake"></i></div>
                 <h3>صيانة التكييف</h3>
-                <p>ضمان برودة مثالية في الصيف.</p>
-                <ul><li>تعبئة فريون أصلي.</li><li>تنظيف الثلاجة وتغيير الفلتر.</li></ul>
+                <p>ضمان برودة مثالية ونقاء للهواء داخل مقصورة السيارة.</p>
+                <ul><li>تعبئة فريون أصلي (أمريكي/أوروبي).</li><li>تنظيف وتعقيم دورة التكييف والثلاجة.</li><li>كشف وإصلاح تهريب الفريون.</li></ul>
             </div>
             <div class="detailed-card">
-                <div class="d-icon"><i class="fas fa-car-crash"></i></div>
+                <div class="d-icon"><i class="fas fa-paint-roller"></i></div>
                 <h3>سمكرة ودهان</h3>
-                <p>إعادة السيارة لحالة الوكالة.</p>
-                <ul><li>شفط صدمات (PDR).</li><li>رش فرن حراري.</li></ul>
+                <p>إعادة هيكل السيارة لحالة الوكالة بعد الحوادث لا قدر الله.</p>
+                <ul><li>شفط الصدمات على البارد (PDR) بدون بوية.</li><li>رش فرن حراري بألوان مطابقة تماماً للمصنع.</li><li>تعديل الشاصيه بأجهزة ليزر دقيقة.</li></ul>
             </div>
         </div>
     </div>
@@ -374,18 +597,11 @@
         <div class="footer-grid">
             <div class="footer-brand">
                 <h2>CAR<span>MIX</span> <i class="fas fa-bolt" style="color:var(--accent-color); font-size:1.5rem;"></i></h2>
-                <p>مركز متكامل في القصيم، عنيزة. نقدم أفضل تجربة صيانة للسيارات باستخدام أحدث التقنيات.</p>
+                <p>مركز متكامل في القصيم، عنيزة. نقدم أفضل تجربة صيانة للسيارات باستخدام أحدث التقنيات وفريق عمل محترف.</p>
                 <div class="social-icons">
-                    <a href="https://www.instagram.com/carmix.sa?igsh=MWNqcHlnaGZpems0MA%3D%3D&utm_source=qr" target="_blank" class="social-btn">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://snapchat.com/t/PKjnaCak" target="_blank" class="social-btn">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
-                    <a href="https://snapchat.com/t/pyk9Oqyp" target="_blank" class="social-btn">
-                        <i class="fab fa-snapchat-ghost"></i>
-                    </a>
-                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/carmix.sa?igsh=MWNqcHlnaGZpems0MA%3D%3D&utm_source=qr" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="https://snapchat.com/t/PKjnaCak" target="_blank" class="social-btn"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://snapchat.com/t/pyk9Oqyp" target="_blank" class="social-btn"><i class="fab fa-snapchat-ghost"></i></a>
                 </div>
             </div>
 
@@ -395,66 +611,57 @@
                     <li><a href="#home">الرئيسية</a></li>
                     <li><a href="#services">الخدمات</a></li>
                     <li><a href="#booking">حجز موعد</a></li>
-                    <li><a href="#">الأسعار</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>المزيد</h3>
-                <ul class="footer-links">
-                    <li><a href="#">عن المركز</a></li>
-                    <li><a href="#">فريق العمل</a></li>
-                    <li><a href="#">الأسئلة الشائعة</a></li>
-                    <li><a href="#">سياسة الضمان</a></li>
-                </ul>
+                    <li><a href="#faq">الأسئلة الشائعة</a></li> </ul>
             </div>
 
             <div class="footer-col">
                 <h3>تواصل معنا</h3>
-                
                 <div class="contact-list-container">
                     <a href="https://maps.app.goo.gl/68YuZ11RvKuqhPWw9" target="_blank" class="contact-link">
                         <div class="contact-item">
-                            <div class="c-icon-box">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
+                            <div class="c-icon-box"><i class="fas fa-map-marker-alt"></i></div>
                             <div class="c-text">
                                 <span class="c-label">الموقع</span>
-                                <span class="c-value">القصيم، عنيزة - الصناعية</span>
+                                <span class="c-value" style="color: #ffffff; font-weight: bold;">القصيم، عنيزة - الصناعية</span>
                             </div>
                         </div>
                     </a>
-
-                    <div class="contact-item">
-                        <div class="c-icon-box">
-                            <i class="fas fa-phone-alt"></i>
+                    
+                    <a href="tel:0506661632" class="contact-link">
+                        <div class="contact-item">
+                            <div class="c-icon-box"><i class="fas fa-phone-alt"></i></div>
+                            <div class="c-text">
+                                <span class="c-label">الهاتف</span>
+                                <span class="c-value en-font">050 666 1632</span>
+                            </div>
                         </div>
-                        <div class="c-text">
-                            <span class="c-label">الهاتف</span>
-                            <span class="c-value en-font">050 666 1632</span>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="c-icon-box">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <div class="c-text">
-                            <span class="c-label">البريد الإلكتروني</span>
-                            <span class="c-value en-font">info@carmex.sa</span>
-                        </div>
-                    </div>
-
+                    </a>
                 </div>
             </div>
         </div>
 
         <div class="copyright">
-            © 2025 كارمكس للعناية بالسيارات. جميع الحقوق محفوظة.
+            © 2025 كارمكس للعناية بالسيارات. جميع الحقوق محفوظة. 
+            <span style="display:inline-block; margin-right: 5px;">
+                | تطوير وتصميم: 
+                <a href="https://www.instagram.com/exxerl?igsh=MXFzcHg5enMyYnh4cA%3D%3D&utm_source=qr" target="_blank" style="color: var(--accent-color); text-decoration: none; font-weight: bold;">
+                    <i class="fab fa-instagram" style="margin-left: 3px;"></i> خالد سليمان
+                </a>
+            </span>
         </div>
     </footer>
 
     <script>
+        // شاشة التحميل
+        window.addEventListener('load', () => {
+            const loader = document.querySelector('.loader');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 800);
+        });
+
+        // النوافذ المنبثقة
         const viewAllBtn = document.getElementById('view-all-btn');
         const overlay = document.getElementById('full-services-overlay');
         const closeBtn = document.getElementById('close-overlay');
@@ -474,6 +681,24 @@
                 overlay.classList.remove('active');
                 document.body.style.overflow = 'auto';
             }
+        });
+
+        // تأثير الهيدر عند التمرير + زر الصعود
+        const header = document.querySelector('header');
+        const scrollBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+                scrollBtn.style.display = 'flex';
+            } else {
+                header.classList.remove('scrolled');
+                scrollBtn.style.display = 'none';
+            }
+        });
+
+        // العودة للأعلى
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     </script>
 </body>
