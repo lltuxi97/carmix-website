@@ -24,7 +24,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; scroll-behavior: smooth; }
         body { background-color: var(--main-dark); color: var(--text-light); overflow-x: hidden; position: relative; }
-        body.no-scroll { overflow: hidden; } /* لمنع التمرير عند فتح القائمة */
+        body.no-scroll { overflow: hidden; }
         
         ::-webkit-scrollbar { width: 10px; background: var(--main-dark); }
         ::-webkit-scrollbar-thumb { background: linear-gradient(var(--accent-color), #d97706); border-radius: 10px; border: 2px solid var(--main-dark); }
@@ -52,8 +52,27 @@
         }
         #scrollTopBtn:hover { transform: translateY(-5px); }
 
+        .float-wa {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background-color: var(--whatsapp-color); color: #fff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 35px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 999; text-decoration: none;
+            transition: 0.3s; animation: pulse-wa 2s infinite;
+        }
+        .float-wa:hover { transform: scale(1.1); }
+        @keyframes pulse-wa {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        .reveal {
+            opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out;
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
         /* =========================================
-           2. الهيدر وقائمة الجوال
+           2. الهيدر
            ========================================= */
         header {
             position: fixed; top: 0; width: 100%; z-index: 1000; padding: 15px 5%;
@@ -66,7 +85,6 @@
         header.scrolled { padding: 12px 5%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         .logo { display: flex; align-items: center; z-index: 1002; }
-        /* استخدام اسم الصورة المزدوج هنا */
         .logo img {
             height: 80px; width: auto; background-color: #fff; padding: 8px 35px; border-radius: 40px; 
             box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -74,7 +92,6 @@
         .logo img:hover { transform: scale(1.03); box-shadow: 0 0 35px rgba(245, 158, 11, 0.6); }
         header.scrolled .logo img { height: 65px; padding: 6px 25px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
         
-        /* القائمة في الشاشات الكبيرة */
         .nav-menu { display: flex; gap: 35px; }
         .nav-menu a { color: #cbd5e1; text-decoration: none; font-weight: 500; transition: 0.3s; position: relative; font-size: 1.05rem; }
         .nav-menu a::after { content: ''; position: absolute; bottom: -5px; right: 0; width: 0; height: 2px; background: var(--accent-color); transition: 0.3s; }
@@ -90,44 +107,23 @@
         .cta-btn span { display: block; transform: skewX(10deg); }
         .cta-btn:hover { transform: skewX(-10deg) translateY(-3px); box-shadow: 0 15px 30px var(--accent-glow); color: #fff; }
 
-        /* زر القائمة (Hamburger) - مخفي في الشاشات الكبيرة */
         .menu-toggle {
-            display: none;
-            cursor: pointer;
-            z-index: 1002;
-            font-size: 1.8rem;
-            color: var(--text-light);
-            transition: 0.3s;
+            display: none; cursor: pointer; z-index: 1002; font-size: 1.8rem; color: var(--text-light); transition: 0.3s;
         }
         .menu-toggle:hover { color: var(--accent-color); }
-        .menu-toggle i { transition: 0.3s; }
         .menu-toggle.active i { transform: rotate(90deg); }
 
-        /* قائمة الجوال المنسدلة */
         .mobile-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: rgba(15, 23, 42, 0.98);
-            backdrop-filter: blur(30px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            z-index: 1001;
-            transform: translateY(-100%);
-            transition: transform 0.5s ease-in-out;
-            padding: 80px 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(30px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px;
+            z-index: 1001; transform: translateY(-100%); transition: transform 0.5s ease-in-out; padding: 80px 20px;
         }
         .mobile-nav.active { transform: translateY(0); }
         .mobile-nav a { font-size: 1.5rem; color: #fff; text-decoration: none; font-weight: bold; transition: 0.3s; }
         .mobile-nav a:hover { color: var(--accent-color); }
         .mobile-nav .cta-btn { margin-top: 20px; width: 80%; text-align: center; font-size: 1.3rem; padding: 15px; }
 
-        /* ستايل اللوجو داخل الأقسام */
         .section-logo {
             display: block; margin: 0 auto 25px; height: 65px; width: auto; background: #fff;
             padding: 6px 30px; border-radius: 35px; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); transition: 0.3s;
@@ -143,20 +139,17 @@
             background: radial-gradient(circle at 30% 30%, #233045 0%, var(--main-dark) 70%);
             position: relative; overflow: hidden;
         }
-        .hero-text { width: 45%; z-index: 2; animation: slideInRight 1s ease-out; }
+        .hero-text { width: 45%; z-index: 2; }
         .hero-text h1 { font-size: 4.5rem; margin-bottom: 25px; color: #fff; line-height: 1.1; }
         .hero-text h1 span { color: transparent; -webkit-text-stroke: 2px var(--accent-color); }
         .hero-text p { font-size: 1.3rem; color: #cbd5e1; margin-bottom: 45px; line-height: 1.8; max-width: 90%; }
         
-        .hero-image { width: 50%; z-index: 2; display: flex; justify-content: center; animation: slideInLeft 1s ease-out; }
+        .hero-image { width: 50%; z-index: 2; display: flex; justify-content: center; }
         .hero-image img { 
             width: 100%; max-width: 700px; border-radius: 30px; 
             box-shadow: 0 30px 70px rgba(0,0,0,0.6); 
             mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
         }
-
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
 
         .custom-shape-divider-bottom {
             position: absolute; bottom: 0; left: 0; width: 100%; overflow: hidden; line-height: 0; z-index: 3;
@@ -180,6 +173,51 @@
         .feature-box i { font-size: 3rem; color: var(--accent-color); margin-bottom: 20px; display: inline-block; }
         .feature-box h3 { font-size: 1.4rem; margin-bottom: 15px; }
         .feature-box p { color: #cbd5e1; line-height: 1.6; }
+
+        /* =========================================
+           شريط ماركات السيارات
+           ========================================= */
+        .brands-section {
+            padding: 50px 0;
+            background: #0f172a;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            direction: ltr;
+            border-bottom: 1px solid var(--border-glass);
+        }
+        .brands-track {
+            display: inline-block;
+            animation: slide 30s linear infinite;
+        }
+        .brand-logo {
+            height: 60px;
+            margin: 0 40px;
+            opacity: 0.4;
+            transition: 0.3s;
+            filter: grayscale(100%);
+            cursor: pointer;
+        }
+        .brand-logo:hover {
+            opacity: 1;
+            filter: grayscale(0%);
+            transform: scale(1.15);
+        }
+        @keyframes slide {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* =========================================
+           شريط الإحصائيات
+           ========================================= */
+        .stats-section {
+            padding: 60px 5%; background-color: rgba(15, 23, 42, 0.5); 
+            display: flex; justify-content: center; gap: 80px; flex-wrap: wrap; border-bottom: 1px solid var(--border-glass);
+        }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 3.5rem; font-weight: 800; color: #fff; display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 1.1rem; color: var(--accent-color); font-weight: bold; }
 
         /* =========================================
            4. قسم الخدمات
@@ -353,19 +391,10 @@
 
         .copyright { text-align: center; border-top: 1px solid #1e293b; padding-top: 25px; color: #64748b; font-size: 0.9rem; line-height: 1.8; }
 
-        /* =========================================
-           تعديلات الموبايل (Media Queries) - الحل هنا
-           ========================================= */
         @media (max-width: 900px) {
-            /* إخفاء القائمة العادية وزر الحجز */
             .nav-menu, header .cta-btn { display: none; }
-            
-            /* إظهار زر القائمة (Hamburger) */
             .menu-toggle { display: block; }
-            
-            /* تنسيق الهيدر ليكون اللوجو والزر متباعدين */
             header { justify-content: space-between; padding: 15px 20px; }
-
             .hero { flex-direction: column; text-align: center; padding-top: 120px; }
             .hero-text { width: 100%; margin-bottom: 50px; }
             .hero-image { width: 90%; }
@@ -377,9 +406,9 @@
             .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; }
             .contact-item { justify-content: center; } .social-icons { justify-content: center; } .c-text { text-align: right; }
             
-            /* تعديل حجم اللوجو للموبايل */
             .logo img { height: 70px; padding: 6px 25px; }
             header.scrolled .logo img { height: 60px; padding: 5px 20px; }
+            .float-wa { width: 50px; height: 50px; font-size: 28px; bottom: 20px; right: 20px; }
         }
     </style>
 </head>
@@ -388,6 +417,10 @@
     <div class="loader"><div class="spinner"></div></div>
 
     <button id="scrollTopBtn"><i class="fas fa-arrow-up"></i></button>
+
+    <a href="https://wa.me/966506661632?text=السلام%20عليكم،%20أريد%20حجز%20موعد" target="_blank" class="float-wa">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <header>
         <div class="logo">
@@ -405,21 +438,23 @@
             <i class="fas fa-bars"></i>
         </div>
     </header>
+
     <div class="mobile-nav" id="mobile-nav-menu">
         <a href="#home" class="mobile-link">الرئيسية</a>
         <a href="#services" class="mobile-link">الخدمات</a>
         <a href="#booking" class="mobile-link">حجز موعد</a>
         <a href="#booking" class="cta-btn mobile-link"><span>احجز الآن</span></a>
     </div>
+
     <section class="hero" id="home">
-        <div class="hero-text">
+        <div class="hero-text reveal">
             <h1>CAR<span>MIX</span><br>رعاية احترافية</h1>
             <p>نقدم لك في كارمكس مستوى جديد كلياً من العناية. دقة هندسية، قطع غيار أصلية، وضمان يريح بالك. نحن نعتني بسيارتك كما لو كانت سيارتنا.</p>
             <div style="display: flex; gap: 20px; justify-content: flex-start;">
                 <a href="#services" class="cta-btn"><span>اكتشف خدماتنا</span></a>
             </div>
         </div>
-        <div class="hero-image">
+        <div class="hero-image reveal">
             <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1000&auto=format&fit=crop" alt="Luxury Car">
         </div>
         
@@ -430,14 +465,51 @@
         </div>
     </section>
 
-    <div class="features-strip">
+    <div class="features-strip reveal">
         <div class="feature-box"><i class="fas fa-check-double"></i><h3>جودة مضمونة</h3><p>قطع غيار أصلية 100% مع ضمان شامل على جميع الإصلاحات.</p></div>
         <div class="feature-box"><i class="fas fa-user-clock"></i><h3>التزام بالوقت</h3><p>نحترم وقتك ونسلم السيارة في الموعد المحدد بدقة.</p></div>
         <div class="feature-box"><i class="fas fa-tools"></i><h3>تقنيات متطورة</h3><p>نستخدم أحدث أجهزة الفحص والتشخيص المعتمدة عالمياً.</p></div>
     </div>
 
+    <div class="brands-section reveal">
+        <div class="brands-track">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_carlogo.svg" class="brand-logo" alt="Toyota">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg" class="brand-logo" alt="Ford">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" class="brand-logo" alt="BMW">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" class="brand-logo" alt="Mercedes">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Honda.svg" class="brand-logo" alt="Honda">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg" class="brand-logo" alt="Hyundai">
+            <img src="https://cdn.worldvectorlogo.com/logos/nissan-6.svg" class="brand-logo" alt="Nissan">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Chevrolet-logo.png" class="brand-logo" alt="Chevrolet">
+            
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_carlogo.svg" class="brand-logo" alt="Toyota">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg" class="brand-logo" alt="Ford">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" class="brand-logo" alt="BMW">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" class="brand-logo" alt="Mercedes">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Honda.svg" class="brand-logo" alt="Honda">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg" class="brand-logo" alt="Hyundai">
+            <img src="https://cdn.worldvectorlogo.com/logos/nissan-6.svg" class="brand-logo" alt="Nissan">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Chevrolet-logo.png" class="brand-logo" alt="Chevrolet">
+        </div>
+    </div>
+
+    <div class="stats-section reveal">
+        <div class="stat-item">
+            <span class="stat-number" data-target="1000">0</span>
+            <span class="stat-label">عميل سعيد</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="15">0</span>
+            <span class="stat-label">سنة خبرة</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="100">0</span>
+            <span class="stat-label">% ضمان الجودة</span>
+        </div>
+    </div>
+
     <section class="services-section" id="services">
-        <div class="section-header">
+        <div class="section-header reveal">
             <div>
                 <span style="color:var(--accent-color); font-weight:bold; letter-spacing: 2px; display: block; margin-bottom: 10px;">خدماتنا المتميزة</span>
                 <h2>حلول متكاملة لسيارتك</h2>
@@ -445,7 +517,7 @@
             <a href="javascript:void(0)" id="view-all-btn" class="view-all-link">عرض التفاصيل الكاملة <i class="fas fa-arrow-left"></i></a>
         </div>
 
-        <div class="services-container">
+        <div class="services-container reveal">
             
             <div class="service-card-tall">
                 <div class="service-image-box">
@@ -506,13 +578,13 @@
     </section>
 
     <section class="booking-section" id="booking">
-        <div class="booking-header-center">
+        <div class="booking-header-center reveal">
             <img src="logo.jpg.jpg" class="section-logo" alt="CARMIX Logo">
             <h2>احجز موعدك <br><span>أونلاين</span></h2>
             <p>سجل بياناتك هنا وسيصلنا إيميل فوري بطلبك. سنتواصل معك لتأكيد الموعد بأسرع وقت.</p>
         </div>
 
-        <div class="booking-content-wrapper">
+        <div class="booking-content-wrapper reveal">
             
             <div class="hours-card">
                 <div class="hours-header">
@@ -578,7 +650,7 @@
             <img src="logo.jpg.jpg" class="section-logo" alt="CARMIX Logo">
         </div>
         <h3 class="faq-title" style="text-align:center; font-size:2.5rem; color:#fff; margin-bottom:40px;">الأسئلة الشائعة</h3>
-        <div class="faq-container">
+        <div class="faq-container reveal">
             <div class="faq-box">
                 <div class="faq-question"><i class="fas fa-question-circle"></i> هل قطع الغيار المستخدمة أصلية؟</div>
                 <div class="faq-answer">نعم، في كارمكس نلتزم باستخدام قطع الغيار الأصلية (OEM) أو المعتمدة من الوكالة لضمان الجودة والأداء.</div>
@@ -714,7 +786,6 @@
     </footer>
 
     <script>
-        // كود التحميل (Loader)
         window.addEventListener('load', () => {
             const loader = document.querySelector('.loader');
             setTimeout(() => {
@@ -723,7 +794,6 @@
             }, 800);
         });
 
-        // كود قائمة الجوال (Hamburger Menu) - الجديد
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileNavMenu = document.getElementById('mobile-nav-menu');
         const mobileLinks = document.querySelectorAll('.mobile-link');
@@ -742,7 +812,6 @@
             });
         });
 
-        // كود النافذة المنبثقة (Overlay)
         const viewAllBtn = document.getElementById('view-all-btn');
         const overlay = document.getElementById('full-services-overlay');
         const closeBtn = document.getElementById('close-overlay');
@@ -764,7 +833,6 @@
             }
         });
 
-        // كود تأثير الهيدر عند التمرير وزر العودة للأعلى
         const header = document.querySelector('header');
         const scrollBtn = document.getElementById('scrollTopBtn');
         window.addEventListener('scroll', () => {
@@ -780,6 +848,45 @@
         scrollBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // كود الأنيميشن عند الظهور
+        const reveals = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        reveals.forEach(reveal => revealObserver.observe(reveal));
+
+        // كود عداد الأرقام
+        const stats = document.querySelectorAll('.stat-number');
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = +counter.getAttribute('data-target');
+                    const increment = target / 50; 
+                    
+                    const updateCounter = () => {
+                        const count = +counter.innerText;
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + increment);
+                            setTimeout(updateCounter, 30);
+                        } else {
+                            counter.innerText = target + "+";
+                        }
+                    };
+                    updateCounter();
+                    statsObserver.unobserve(counter);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        stats.forEach(stat => statsObserver.observe(stat));
     </script>
 </body>
 </html>
